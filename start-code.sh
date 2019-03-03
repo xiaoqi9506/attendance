@@ -18,6 +18,7 @@ docker build -t $img_output .
 docker rm -f attendance
 
 docker run -d --restart=on-failure:5 --privileged=true \
+       -p 8080:8080 \
        --name attendance  attendance \
        java \
        -Duser.timezone=Asia/Shanghai \
