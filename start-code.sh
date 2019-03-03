@@ -16,6 +16,8 @@ docker build -t $img_output .
 
 docker rm -f attendance
 
+sudo mv $proj_home/attendance-provider/target/attendance-provider-0.0.1-SNAPSHOT.jar $proj_home/attendance-provider/target/demo.jar # 兼容所有sh脚本
+
 docker run -d --restart=on-failure:5 --privileged=true \
        --name attendance  attendance \
        java \
