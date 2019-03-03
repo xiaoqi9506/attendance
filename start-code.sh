@@ -24,4 +24,4 @@ docker run -d --restart=on-failure:5 --privileged=true \
        -XX:+PrintGCTimeStamps \
        -XX:+PrintGCDetails \
        -XX:+HeapDumpOnOutOfMemoryError \
-       -jar /usr/local/demo.jar
+       -jar /home/demo.jar
