@@ -20,8 +20,4 @@ docker run -d --restart=on-failure:5 --privileged=true \
        --name attendance  attendance \
        java \
        -Duser.timezone=Asia/Shanghai \
-       -XX:+PrintGCDateStamps \
-       -XX:+PrintGCTimeStamps \
-       -XX:+PrintGCDetails \
-       -XX:+HeapDumpOnOutOfMemoryError \
        -jar /home/demo.jar
