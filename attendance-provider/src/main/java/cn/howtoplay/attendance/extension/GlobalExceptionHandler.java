@@ -1,6 +1,7 @@
 package cn.howtoplay.attendance.extension;
 
 import cn.howtoplay.attendance.common.Payload;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -13,6 +14,7 @@ import javax.ws.rs.ext.Provider;
  * @author xiaoqi on 2019/3/1
  */
 @Provider
+@Component
 public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
 
     @Override

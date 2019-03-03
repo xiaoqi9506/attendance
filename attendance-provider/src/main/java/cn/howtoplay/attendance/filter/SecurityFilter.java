@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 @Provider
 @NeedToken
+@Component
 public class SecurityFilter implements ContainerRequestFilter {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
