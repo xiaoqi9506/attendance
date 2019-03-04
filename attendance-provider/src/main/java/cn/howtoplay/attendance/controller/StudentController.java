@@ -6,17 +6,13 @@ import cn.howtoplay.attendance.domain.eo.Student;
 import cn.howtoplay.attendance.domain.vo.StudentVo;
 import cn.howtoplay.attendance.extension.ApplicationException;
 import cn.howtoplay.attendance.service.StudentService;
-import cn.hutool.core.collection.CollectionUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
-import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
@@ -97,8 +93,8 @@ public class StudentController {
     @Path("/login")
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Payload login(@FormParam("studentCode") @NotNull String studentCode,
-                         @FormParam("password") @NotNull String password,
+    public Payload login(@FormParam("studentCode")  String studentCode,
+                         @FormParam("password")  String password,
                          @FormParam("verificationId") String verificationId,
                          @FormParam("code") String code)
     {
