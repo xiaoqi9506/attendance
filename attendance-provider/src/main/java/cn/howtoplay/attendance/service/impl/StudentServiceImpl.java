@@ -4,6 +4,7 @@ import cn.howtoplay.attendance.common.AESUtil;
 import cn.howtoplay.attendance.common.CodeUtil;
 import cn.howtoplay.attendance.common.MD5Util;
 import cn.howtoplay.attendance.domain.eo.Student;
+import cn.howtoplay.attendance.domain.vo.StudentAttendancelogsVo;
 import cn.howtoplay.attendance.domain.vo.StudentVo;
 import cn.howtoplay.attendance.extension.ApplicationException;
 import cn.howtoplay.attendance.mapper.StudentMapper;
@@ -234,5 +235,10 @@ public class StudentServiceImpl implements StudentService {
         student.setOpenId(openid);
         studentMapper.updateById(student);
         return "success";
+    }
+
+    @Override
+    public List<StudentAttendancelogsVo> listAttendancelogs(Student student) {
+        return null;
     }
 }

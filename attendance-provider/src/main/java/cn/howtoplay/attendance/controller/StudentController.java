@@ -3,6 +3,7 @@ package cn.howtoplay.attendance.controller;
 import cn.howtoplay.attendance.annotation.NeedToken;
 import cn.howtoplay.attendance.common.Payload;
 import cn.howtoplay.attendance.domain.eo.Student;
+import cn.howtoplay.attendance.domain.vo.StudentAttendancelogsVo;
 import cn.howtoplay.attendance.domain.vo.StudentVo;
 import cn.howtoplay.attendance.extension.ApplicationException;
 import cn.howtoplay.attendance.service.StudentService;
@@ -28,6 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -202,5 +204,17 @@ public class StudentController {
             throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
         }
         return new Payload(student);
+    }
+
+    @GET
+    @Path("/attendancelogs")
+    @NeedToken
+    public Payload listAttendancelogs(@CookieParam("token") String token) {
+        Student student = studentService.findByToken(token);
+        if (null == student) {
+            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
+        }
+        List<StudentAttendancelogsVo> list = studentService.listAttendancelogs(student);
+        return new Payload(list);
     }
 }

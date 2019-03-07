@@ -1,6 +1,7 @@
 package cn.howtoplay.attendance.service;
 
 import cn.howtoplay.attendance.domain.eo.Student;
+import cn.howtoplay.attendance.domain.vo.StudentAttendancelogsVo;
 import cn.howtoplay.attendance.domain.vo.StudentVo;
 import com.github.pagehelper.PageInfo;
 
@@ -33,4 +34,6 @@ public interface StudentService {
     Map<String, Object> wxLogin(String code);
 
     String bindOpenid(String studentCode, String password, String token);
+
+    List<StudentAttendancelogsVo> listAttendancelogs(Student student);
 }
