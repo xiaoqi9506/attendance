@@ -26,4 +26,7 @@
     <select id="selectOneByStudentCode" resultType="cn.howtoplay.attendance.domain.eo.Student">
         SELECT *FROM scau_student WHERE student_code = #{studentCode}
     </select>
+    <select id="selectByOpenId" resultType="cn.howtoplay.attendance.domain.eo.Student">
+        SELECT *FROM scau_student WHERE open_id = #{openid}
+    </select>
 </mapper>

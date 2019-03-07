@@ -27,4 +27,10 @@ public interface StudentService {
     void add(Student students);
 
     void updatePassword(Student student, String newPassword);
+
+    String wxAuthor(Student student, String code);
+
+    Map<String, Object> wxLogin(String code);
+
+    String bindOpenid(String studentCode, String password, String token);
 }

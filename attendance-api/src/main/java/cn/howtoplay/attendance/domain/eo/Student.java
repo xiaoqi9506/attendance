@@ -76,7 +76,7 @@ public class Student extends SuperEntity{
     /**
      * 学院代码
      */
-    private String code;
+    private String collegeCode;
 
     /**
      * 班级
@@ -87,6 +87,11 @@ public class Student extends SuperEntity{
      * 序号
      */
     private Integer number;
+
+    /**
+     * 微信绑定
+     */
+    private String openId;
 
     /**
      * 记录状态，备用
@@ -208,5 +213,21 @@ public class Student extends SuperEntity{
     @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
+    }
+
+    public String getCollegeCode() {
+        return collegeCode;
+    }
+
+    public void setCollegeCode(String collegeCode) {
+        this.collegeCode = collegeCode;
     }
 }

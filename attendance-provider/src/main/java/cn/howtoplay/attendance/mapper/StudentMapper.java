@@ -21,4 +21,6 @@ public interface StudentMapper extends BaseMapper<Student> {
     List<StudentVo> findList(@Param("name") String name, @Param("studentCode") String studentCode);
 
     Student selectOneByStudentCode(@Param("studentCode") String studentCode);
+
+    Student selectByOpenId(@Param("openid") String openid);
 }

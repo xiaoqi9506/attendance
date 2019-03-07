@@ -1,5 +1,6 @@
 package cn.howtoplay.attendance.service.impl;
 
+import cn.howtoplay.attendance.common.AESUtil;
 import cn.howtoplay.attendance.common.CodeUtil;
 import cn.howtoplay.attendance.common.MD5Util;
 import cn.howtoplay.attendance.domain.eo.Student;
@@ -7,13 +8,17 @@ import cn.howtoplay.attendance.domain.vo.StudentVo;
 import cn.howtoplay.attendance.extension.ApplicationException;
 import cn.howtoplay.attendance.mapper.StudentMapper;
 import cn.howtoplay.attendance.service.StudentService;
+import cn.howtoplay.attendance.service.WxService;
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.crypto.symmetric.SymmetricCrypto;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -42,6 +47,9 @@ public class StudentServiceImpl implements StudentService {
 
     @Autowired
     private RedissonClient redissonClient;
+
+    @Autowired
+    private WxService wxService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -133,17 +141,98 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student findByToken(String token) {
-        RMap<String, String> map = redissonClient.getMap("students:tokens");
-        if (null == map || null == map.get(token)) {
-            return null;
-        }
-        String studentCode = map.get(token);
-        return studentMapper.selectOneByStudentCode(studentCode);
+//        RMap<String, String> map = redissonClient.getMap("students:tokens");
+//        if (null == map || null == map.get(token)) {
+//            return null;
+//        }
+//        String redisStr = map.get(token);
+//        if (StringUtils.isEmpty(redisStr)) {
+//            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
+//        }
+        String decryStr = AESUtil.aesDecrypt(token);
+        Map map1 = JSONObject.parseObject(decryStr, Map.class);
+        String openid = (String) map1.get("openid");
+        return studentMapper.selectByOpenId(openid);
 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updatePassword(Student student, String newPassword) {
-        studentMapper.update(student, new UpdateWrapper<Student>().set("password", newPassword));
+        studentMapper.update(student, new UpdateWrapper<Student>().set("password", MD5Util.generate(newPassword)));
+    }
+
+    @Override
+    public String wxAuthor(Student student, String code) {
+        Map<String, Object> map = wxService.wxLogin(code);
+        String openid = (String) map.get("openid");
+        if (StringUtils.isEmpty(openid)) {
+            throw new ApplicationException(Response.Status.INTERNAL_SERVER_ERROR, "获取授权失败");
+        }
+        studentMapper.update(student, new UpdateWrapper<Student>().set("open_id", MD5Util.generate(openid)));
+        return "success";
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> wxLogin(String code) {
+        Map<String, Object> map = wxService.wxLogin(code);
+        String openid = (String) map.get("openid");
+        String sessionKey = (String) map.get("session_key");
+        if (StringUtils.isEmpty(openid) || StringUtils.isEmpty(sessionKey)) {
+            throw new ApplicationException(Response.Status.INTERNAL_SERVER_ERROR, "获取授权失败");
+        }
+        //生成token
+        logger.info(JSONObject.toJSONString(map));
+
+        String token = AESUtil.aesEncrypt(JSONObject.toJSONString(map));
+//        RMap<String, String> tokens = redissonClient.getMap("students:tokens");
+//        RMap<String, String> onlines = redissonClient.getMap("students:onlines");
+//
+//        //判断是否已经登录,如果已经登录，删除redis缓存，重新保存token
+//        if (null != onlines && null != onlines.get(openid)) {
+//            tokens.remove(onlines.get(openid));
+//        }
+//
+//        logger.info("token保存到缓存====>student_code：{}, token：{}", openid, token);
+//        tokens.put(token, student.getStudentCode());
+//        onlines.put(student.getStudentCode(), token);
+
+        Student student = studentMapper.selectByOpenId(openid);
+        boolean binded = true;
+        if (null == student) {
+            binded = false;
+        }else {
+            student.setLastLogin(new Date());
+            studentMapper.updateById(student);
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("token", token);
+        result.put("binded", binded);
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public String bindOpenid(String studentCode, String password, String token) {
+        //根据学号获取学生信息
+        Student student = studentMapper.selectOneByStudentCode(studentCode);
+        if (null == student || !MD5Util.verify(password, student.getPassword())) {
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "学号或密码错误!");
+        }
+//        RMap<String, String> map = redissonClient.getMap("students:tokens");
+//        if (null == map || null == map.get(token)) {
+//            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
+//        }
+//        String redisStr = map.get(token);
+//        if (StringUtils.isEmpty(redisStr)) {
+//            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
+//        }
+        String decryStr = AESUtil.aesDecrypt(token);
+        Map map1 = JSONObject.parseObject(decryStr, Map.class);
+        String openid = (String) map1.get("openid");
+        student.setOpenId(openid);
+        studentMapper.updateById(student);
+        return "success";
     }
 }

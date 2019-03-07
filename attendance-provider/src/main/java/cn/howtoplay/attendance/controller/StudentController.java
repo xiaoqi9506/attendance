@@ -7,6 +7,7 @@ import cn.howtoplay.attendance.domain.vo.StudentVo;
 import cn.howtoplay.attendance.extension.ApplicationException;
 import cn.howtoplay.attendance.service.StudentService;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -133,16 +134,73 @@ public class StudentController {
     @NeedToken
     @PUT
     @Path("/updatePassword")
-    public Payload updatePassword(@CookieParam("token") String token) {
+    public Payload updatePassword(@CookieParam("token") String token, Map<String, String> body) {
         //TODO 拿到token
         Student student = studentService.findByToken(token);
         if (null == student) {
             throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
         }
         //密码一致性校验
-
+        String newPassword = body.get("newPassword");
+        String confirmPassword = body.get("confirmPassword");
+        if (StringUtils.isEmpty(confirmPassword) || StringUtils.isEmpty(newPassword)) {
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "输入不能为空");
+        }
+        if (!confirmPassword.equals(newPassword)) {
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "参数有误");
+        }
         //更改密码
-        studentService.updatePassword(student, "");
+        studentService.updatePassword(student, newPassword);
         return new Payload<>("success");
+    }
+
+    @GET
+    @Path("/author")
+    @NeedToken
+    public Payload wxAuthor(@QueryParam("code") String code, @CookieParam("token") String token) {
+        Student student = studentService.findByToken(token);
+        if (null == student) {
+            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
+        }
+        return new Payload(studentService.wxAuthor(student, code));
+    }
+
+    @GET
+    @Path("/wxLogin")
+    public Payload wxLogin(@QueryParam("code") String code) {
+        if (StringUtils.isEmpty(code)) {
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "微信授权失败");
+        }
+        Map<String, Object> map = studentService.wxLogin(code);
+        String token = (String) map.get("token");
+        //token放cookie
+        Cookie cookie = new Cookie("token", token);
+        response.addCookie(cookie);
+        return new Payload(map);
+    }
+
+    @Path("/openid")
+    @PUT
+    @NeedToken
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Payload bindOpenId(@FormParam("studentCode")  String studentCode,
+                              @FormParam("password")  String password,
+                              @CookieParam("token") String token)
+    {
+        if (StringUtils.isEmpty(studentCode) || StringUtils.isEmpty(password)) {
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "参数有误");
+        }
+       return new Payload(studentService.bindOpenid(studentCode, password, token));
+    }
+
+    @GET
+    @Path("/detail")
+    @NeedToken
+    public Payload getStudentDetail(@CookieParam("token") String token) {
+        Student student = studentService.findByToken(token);
+        if (null == student) {
+            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
+        }
+        return new Payload(student);
     }
 }
