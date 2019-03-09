@@ -3,27 +3,10 @@
 
 <mapper namespace="cn.howtoplay.attendance.mapper.TeacherMapper">
 
-    <insert id="bulkInsert">
-
-    </insert>
-    <select id="findList" resultType="cn.howtoplay.attendance.domain.vo.StudentVo">
-        SELECT
-         id,
-         student_code,
-         name,
-         gender,
-         birthday
-        FROM scau_student
-        <where>
-            <if test="name != null and name != ''">
-                name = #{name}
-            </if>
-            <if test="studentCode != null and studentCode !=''">
-                AND student_code = #{studentCode}
-            </if>
-        </where>
+    <select id="selectByOpenId" resultType="cn.howtoplay.attendance.domain.eo.Teacher">
+        SELECT * FROM scau_teacher WHERE open_id = #{openid}
     </select>
-    <select id="selectOneByStudentCode" resultType="cn.howtoplay.attendance.domain.eo.Student">
-        SELECT *FROM scau_student WHERE student_code = #{studentCode}
+    <select id="selectByTeacherCode" resultType="cn.howtoplay.attendance.domain.eo.Teacher">
+                SELECT * FROM scau_teacher WHERE teacher_code = #{username}
     </select>
 </mapper>

@@ -4,17 +4,18 @@ import cn.howtoplay.attendance.common.AESUtil;
 import cn.howtoplay.attendance.common.CodeUtil;
 import cn.howtoplay.attendance.common.MD5Util;
 import cn.howtoplay.attendance.domain.eo.Student;
+import cn.howtoplay.attendance.domain.eo.Teacher;
 import cn.howtoplay.attendance.domain.vo.StudentAttendancelogsVo;
 import cn.howtoplay.attendance.domain.vo.StudentVo;
 import cn.howtoplay.attendance.extension.ApplicationException;
 import cn.howtoplay.attendance.mapper.StudentMapper;
+import cn.howtoplay.attendance.mapper.TeacherMapper;
 import cn.howtoplay.attendance.service.StudentService;
 import cn.howtoplay.attendance.service.WxService;
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.crypto.symmetric.SymmetricCrypto;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.PageHelper;
@@ -51,6 +52,9 @@ public class StudentServiceImpl implements StudentService {
 
     @Autowired
     private WxService wxService;
+
+    @Autowired
+    private TeacherMapper teacherMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -200,26 +204,48 @@ public class StudentServiceImpl implements StudentService {
 //        onlines.put(student.getStudentCode(), token);
 
         Student student = studentMapper.selectByOpenId(openid);
+        Teacher teacher = teacherMapper.selectByOpenId(openid);
+        String loginType = null;
         boolean binded = true;
-        if (null == student) {
+        if (null == student && null == teacher) {
             binded = false;
         }else {
-            student.setLastLogin(new Date());
-            studentMapper.updateById(student);
+            if (null != student) {
+                student.setLastLogin(new Date());
+                studentMapper.updateById(student);
+                loginType = "student";
+            }else {
+                teacher.setLastLogin(new Date());
+                teacherMapper.updateById(teacher);
+                loginType = "teacher";
+            }
         }
         Map<String, Object> result = new HashMap<>();
         result.put("token", token);
         result.put("binded", binded);
+        result.put("loginType", loginType);
         return result;
     }
 
     @Override
     @Transactional
-    public String bindOpenid(String studentCode, String password, String token) {
+    public String bindOpenid(String username, String password, String token) {
+        //解析token
+        String decryStr = AESUtil.aesDecrypt(token);
+        Map map1 = JSONObject.parseObject(decryStr, Map.class);
+        String openid = (String) map1.get("openid");
+        if (StringUtils.isEmpty(openid)) {
+            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token解析失败");
+        }
         //根据学号获取学生信息
-        Student student = studentMapper.selectOneByStudentCode(studentCode);
-        if (null == student || !MD5Util.verify(password, student.getPassword())) {
-            throw new ApplicationException(Response.Status.BAD_REQUEST, "学号或密码错误!");
+        Student student = studentMapper.selectOneByStudentCode(username);
+        if (null != student) {
+            if (!MD5Util.verify(password, student.getPassword())) {
+                throw new ApplicationException(Response.Status.BAD_REQUEST, "学号或密码错误!");
+            }
+            student.setOpenId(openid);
+            studentMapper.updateById(student);
+            return "success";
         }
 //        RMap<String, String> map = redissonClient.getMap("students:tokens");
 //        if (null == map || null == map.get(token)) {
@@ -229,12 +255,16 @@ public class StudentServiceImpl implements StudentService {
 //        if (StringUtils.isEmpty(redisStr)) {
 //            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
 //        }
-        String decryStr = AESUtil.aesDecrypt(token);
-        Map map1 = JSONObject.parseObject(decryStr, Map.class);
-        String openid = (String) map1.get("openid");
-        student.setOpenId(openid);
-        studentMapper.updateById(student);
-        return "success";
+        Teacher teacher = teacherMapper.selectByTeacherCode(username);
+        if (null != teacher) {
+            if (!MD5Util.verify(password, teacher.getPassword())) {
+                throw new ApplicationException(Response.Status.BAD_REQUEST, "账号或密码错误!");
+            }
+            teacher.setOpenId(openid);
+            teacherMapper.updateById(teacher);
+            return "success";
+        }
+        throw new ApplicationException(Response.Status.BAD_REQUEST, "账号或密码错误！");
     }
 
     @Override

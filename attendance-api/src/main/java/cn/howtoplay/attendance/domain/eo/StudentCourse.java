@@ -5,7 +5,7 @@ package cn.howtoplay.attendance.domain.eo;
  *
  * @author xiaoqi on 2019/3/7
  */
-public class StudentCource extends SuperEntity {
+public class StudentCourse extends SuperEntity {
 
     /**
      * 学生id
@@ -15,7 +15,7 @@ public class StudentCource extends SuperEntity {
     /**
      * 课程id
      */
-    private String courceId;
+    private String courseId;
 
     /**
      * 记录状态
@@ -35,14 +35,6 @@ public class StudentCource extends SuperEntity {
         this.studentId = studentId;
     }
 
-    public String getCourceId() {
-        return courceId;
-    }
-
-    public void setCourceId(String courceId) {
-        this.courceId = courceId;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -57,5 +49,13 @@ public class StudentCource extends SuperEntity {
 
     public void setScore(Integer score) {
         this.score = score;
+    }
+
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
     }
 }

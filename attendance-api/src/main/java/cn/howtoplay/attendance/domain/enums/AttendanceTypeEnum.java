@@ -7,7 +7,7 @@ public enum AttendanceTypeEnum {
 
     ONTIME("ONTIME", "准时签到"),
     LATE("LATE", "迟到"),
-    AbSENCE("AbSENCE", "缺席"),
+    ABSENCE("ABSENCE", "缺席"),
     LEAVE("LEAVE", "请假");
 
     String name;

@@ -1,6 +1,5 @@
 package cn.howtoplay.attendance.mapper;
 
-import cn.howtoplay.attendance.domain.eo.Student;
 import cn.howtoplay.attendance.domain.eo.Teacher;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -10,5 +9,7 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface TeacherMapper extends BaseMapper<Teacher> {
 
-    Student selectOneByStudentCode(@Param("temp") String t);
+    Teacher selectByOpenId(@Param("openid") String openid);
+
+    Teacher selectByTeacherCode(@Param("username") String username);
 }

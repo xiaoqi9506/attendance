@@ -1,5 +1,8 @@
 package cn.howtoplay.attendance.domain.eo;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 
 /**
@@ -7,6 +10,7 @@ import java.util.Date;
  *
  * @author xiaoqi on 2019/1/26
  */
+@TableName("scau_teacher")
 public class Teacher extends SuperEntity {
 
     /**
@@ -18,17 +22,13 @@ public class Teacher extends SuperEntity {
     /**
      * 登录密码,默认生日,如950620
      */
+    @JsonIgnore
     private String password;
 
     /**
-     * 姓
+     * 姓名
      */
-    private String firstName;
-
-    /**
-     * 名
-     */
-    private String lastName;
+    private String name;
 
     /**
      * 出生年月
@@ -70,6 +70,12 @@ public class Teacher extends SuperEntity {
      */
     private String grade;
 
+    private String status;
+
+    private Date lastLogin;
+
+    private String openId;
+
     public String getTeacherCode() {
         return teacherCode;
     }
@@ -84,22 +90,6 @@ public class Teacher extends SuperEntity {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public Date getBirthday() {
@@ -164,5 +154,37 @@ public class Teacher extends SuperEntity {
 
     public void setGrade(String grade) {
         this.grade = grade;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
     }
 }
