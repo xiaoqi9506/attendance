@@ -10,8 +10,8 @@ public enum AttendanceTypeEnum {
     ABSENCE("ABSENCE", "缺席"),
     LEAVE("LEAVE", "请假");
 
-    String name;
-    String desc;
+    public String name;
+    public String desc;
 
     AttendanceTypeEnum(String name, String desc) {
         this.name = name;

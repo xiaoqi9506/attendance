@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.howtoplay.attendance.mapper.AttendancelogMapper">
+
+    <select id="countByIds" resultType="cn.howtoplay.attendance.domain.vo.CourseScoreVo">
+        SELECT
+        student_cource_id AS id,
+        count(log.id) AS log_count,
+        log.type
+        FROM scau_attendance_log log
+        WHERE log.student_cource_id IN
+        <foreach collection="ids" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
+        GROUP BY log.type
+    </select>
+    <select id="findByStudentIdAndCourseId" resultType="cn.howtoplay.attendance.domain.vo.AttendanceLogsVo">
+        SELECT log.id, log.type, log.created_at
+        FROM scau_attendance_log log
+        WHERE log.student_cource_id = #{courseId}
+        ORDER BY log.created_at
+    </select>
+</mapper>

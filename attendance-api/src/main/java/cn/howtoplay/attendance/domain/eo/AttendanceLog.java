@@ -10,7 +10,7 @@ public class AttendanceLog extends SuperEntity {
     /**
      * 学生课程关联表id
      */
-    private String studentCourceId;
+    private String studentCourseId;
 
     /**
      * 考勤类型，得搞个枚举
@@ -18,14 +18,6 @@ public class AttendanceLog extends SuperEntity {
     private String type;
 
     private String status;
-
-    public String getStudentCourceId() {
-        return studentCourceId;
-    }
-
-    public void setStudentCourceId(String studentCourceId) {
-        this.studentCourceId = studentCourceId;
-    }
 
     public String getType() {
         return type;
@@ -41,5 +33,13 @@ public class AttendanceLog extends SuperEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getStudentCourseId() {
+        return studentCourseId;
+    }
+
+    public void setStudentCourseId(String studentCourseId) {
+        this.studentCourseId = studentCourseId;
     }
 }

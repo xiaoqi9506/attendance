@@ -1,5 +1,6 @@
 package cn.howtoplay.attendance.mapper;
 
+import cn.howtoplay.attendance.domain.vo.CourseScoreVo;
 import cn.howtoplay.attendance.domain.vo.StudentAttendancelogsVo;
 
 import java.util.List;
@@ -10,4 +11,6 @@ import java.util.List;
 public interface StudentCourseMapper {
 
     List<StudentAttendancelogsVo> findLogs(String studentId);
+
+    List<CourseScoreVo> findScoresByStudentId(String studentId);
 }

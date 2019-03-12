@@ -25,7 +25,7 @@ public class StudentCourse extends SuperEntity {
     /**
      * 课程成绩
      */
-    private Integer score;
+    private Double score;
 
     public String getStudentId() {
         return studentId;
@@ -43,19 +43,19 @@ public class StudentCourse extends SuperEntity {
         this.status = status;
     }
 
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
     public String getCourseId() {
         return courseId;
     }
 
     public void setCourseId(String courseId) {
         this.courseId = courseId;
+    }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
     }
 }

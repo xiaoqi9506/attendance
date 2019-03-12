@@ -6,6 +6,17 @@
 
     <select id="findLogs" resultType="cn.howtoplay.attendance.domain.vo.StudentAttendancelogsVo">
         SELECT
-        FROM scau_student_cource sc
+        FROM scau_student_course sc
+    </select>
+    <select id="findScoresByStudentId" resultType="cn.howtoplay.attendance.domain.vo.CourseScoreVo">
+        SELECT
+        sc.id,
+        sc.score,
+        sc.course_id,
+        c.name AS course_name,
+        c.course_code
+        FROM scau_student_course sc JOIN scau_course c
+        ON sc.course_id = c.id
+        WHERE sc.student_id = #{studentId}
     </select>
 </mapper>
