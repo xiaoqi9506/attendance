@@ -22,6 +22,11 @@ public class AESUtil {
     private static final String AES_RULE_DEFAULT = "AES_RULE_SEED";
 
     /**
+     26      * 签名算法
+     27      */
+     public static final String SIGN_ALGORITHMS = "SHA1PRNG";
+
+    /**
      * AES对称加密
      *
      * @param original 原文
@@ -31,7 +36,9 @@ public class AESUtil {
         try {
             //产生密钥
             KeyGenerator keygen = KeyGenerator.getInstance("AES");
-            keygen.init(128, new SecureRandom(AES_RULE_DEFAULT.getBytes()));
+            SecureRandom random = SecureRandom.getInstance(SIGN_ALGORITHMS);
+            random.setSeed(AES_RULE_DEFAULT.getBytes());
+            keygen.init(128, random);
             SecretKey secretKey = keygen.generateKey();
             byte[] raw = secretKey.getEncoded();
             SecretKey key = new SecretKeySpec(raw, "AES");
@@ -60,7 +67,9 @@ public class AESUtil {
         try {
             //产生密钥
             KeyGenerator keygen = KeyGenerator.getInstance("AES");
-            keygen.init(128, new SecureRandom(AES_RULE_DEFAULT.getBytes()));
+            SecureRandom random = SecureRandom.getInstance(SIGN_ALGORITHMS);
+            random.setSeed(AES_RULE_DEFAULT.getBytes());
+            keygen.init(128, random);
             SecretKey secretKey = keygen.generateKey();
             byte[] raw = secretKey.getEncoded();
             SecretKey key = new SecretKeySpec(raw, "AES");

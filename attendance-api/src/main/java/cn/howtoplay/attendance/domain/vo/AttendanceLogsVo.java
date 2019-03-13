@@ -11,7 +11,7 @@ public class AttendanceLogsVo {
 
     private String id;
     private String type;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date createdAt;
 
     public Date getCreatedAt() {
