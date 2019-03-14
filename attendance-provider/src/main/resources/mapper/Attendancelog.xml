@@ -2,6 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="cn.howtoplay.attendance.mapper.AttendancelogMapper">
+    <insert id="bulkInsert">
+        INSERT INTO scau_attendance_log(id, student_course_id, type, created_at, dr, batch_code)
+        VALUES
+        <foreach collection="logs" separator="," item="log">
+            (#{log.id}, #{log.studentCourseId}, #{log.type}, #{log.createdAt}, #{log.dr}, #{log.batchCode})
+        </foreach>
+    </insert>
 
     <select id="countByIds" resultType="cn.howtoplay.attendance.domain.vo.CourseScoreVo">
         SELECT

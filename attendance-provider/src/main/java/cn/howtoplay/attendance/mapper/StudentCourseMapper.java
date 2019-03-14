@@ -13,4 +13,6 @@ public interface StudentCourseMapper {
     List<StudentAttendancelogsVo> findLogs(String studentId);
 
     List<CourseScoreVo> findScoresByStudentId(String studentId);
+
+    List<String> findIdByCourcseId(String courseId);
 }

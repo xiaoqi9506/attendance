@@ -19,4 +19,7 @@
         ON sc.course_id = c.id
         WHERE sc.student_id = #{studentId}
     </select>
+    <select id="findIdByCourcseId" resultType="java.lang.String">
+        SELECT id FROM scau_student_course WHERE course_id = #{courseId}
+    </select>
 </mapper>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.howtoplay.attendance.mapper.CourseMapper">
+
+    <select id="findListByTeacherId" resultType="cn.howtoplay.attendance.domain.vo.CourseVo">
+        SELECT
+        c.id AS course_id,
+        c.name
+        FROM scau_course c
+        WHERE c.teacher_id = #{teacherId}
+    </select>
+</mapper>

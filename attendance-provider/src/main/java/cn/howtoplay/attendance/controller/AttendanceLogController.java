@@ -1,6 +1,8 @@
 package cn.howtoplay.attendance.controller;
 
 import cn.howtoplay.attendance.common.Payload;
+import cn.howtoplay.attendance.service.AttendanceLogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.Consumes;
@@ -21,6 +23,9 @@ import javax.ws.rs.core.MediaType;
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class AttendanceLogController {
 
+    @Autowired
+    private AttendanceLogService attendanceLogService;
+
     @GET
     @Path("/")
     public Payload list() {
@@ -30,6 +35,7 @@ public class AttendanceLogController {
     @POST
     @Path("/")
     public Payload start(@QueryParam("courseId") String courseId) {
-        return new Payload(null);
+        String code = attendanceLogService.start(courseId);
+        return new Payload(code);
     }
 }

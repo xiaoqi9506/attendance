@@ -19,6 +19,8 @@ public class AttendanceLog extends SuperEntity {
 
     private String status;
 
+    private String batchCode;
+
     public String getType() {
         return type;
     }
@@ -41,5 +43,13 @@ public class AttendanceLog extends SuperEntity {
 
     public void setStudentCourseId(String studentCourseId) {
         this.studentCourseId = studentCourseId;
+    }
+
+    public String getBatchCode() {
+        return batchCode;
+    }
+
+    public void setBatchCode(String batchCode) {
+        this.batchCode = batchCode;
     }
 }
