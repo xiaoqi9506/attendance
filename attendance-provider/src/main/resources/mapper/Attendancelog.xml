@@ -12,11 +12,11 @@
 
     <select id="countByIds" resultType="cn.howtoplay.attendance.domain.vo.CourseScoreVo">
         SELECT
-        student_cource_id AS id,
+        student_course_id AS id,
         count(log.id) AS log_count,
         log.type
         FROM scau_attendance_log log
-        WHERE log.student_cource_id IN
+        WHERE log.student_course_id IN
         <foreach collection="ids" separator="," item="id" open="(" close=")">
             #{id}
         </foreach>
@@ -25,7 +25,7 @@
     <select id="findByStudentIdAndCourseId" resultType="cn.howtoplay.attendance.domain.vo.AttendanceLogsVo">
         SELECT log.id, log.type, log.created_at
         FROM scau_attendance_log log
-        WHERE log.student_cource_id = #{courseId}
+        WHERE log.student_course_id = #{courseId}
         ORDER BY log.created_at
     </select>
 </mapper>
