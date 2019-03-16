@@ -17,6 +17,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -55,10 +56,10 @@ public class AttendanceLogController {
         return new Payload(code);
     }
 
-    @POST
-    @Path("/single")
+    @PUT
+    @Path("/")
     @NeedToken
-    public Payload single(@CookieParam("token") String token, @QueryParam("code") String code) {
+    public Payload update(@CookieParam("token") String token, @QueryParam("code") String code) {
         Student student = studentService.findByToken(token);
         if (null == student) {
             throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
