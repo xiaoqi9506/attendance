@@ -19,10 +19,10 @@
         ON sc.course_id = c.id
         WHERE sc.student_id = #{studentId}
     </select>
-    <select id="findIdByCourcseId" resultType="java.lang.String">
+    <select id="findIdByCourseId" resultType="java.lang.String">
         SELECT id FROM scau_student_course WHERE course_id = #{courseId}
     </select>
     <select id="findIdByStudentIdAndCourseId" resultType="java.lang.String">
-        SELECT id FROM scau_student_course WHERE course_id = #{courseId} AND student_id = #{studentId}
+        SELECT id FROM scau_student_course WHERE course_id = #{courseId} AND student_id = #{studentId} AND batch_code = #{code}
     </select>
 </mapper>

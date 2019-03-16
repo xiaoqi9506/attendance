@@ -72,7 +72,7 @@ public class AttendanceLogController {
         if (StringUtils.isEmpty(courseId)) {
             throw new ApplicationException(Response.Status.BAD_REQUEST, "code无效");
         }
-        attendanceLogService.updateStatus(student, courseId);
+        attendanceLogService.updateStatus(student, courseId, code);
         return new Payload(null);
     }
 }

@@ -37,7 +37,7 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String start(String courseId) {
-        List<String> ids = studentCourseMapper.findIdByCourcseId(courseId);
+        List<String> ids = studentCourseMapper.findIdByCourseId(courseId);
         String code = RandomUtil.randomNumbers(4);
         List<AttendanceLog> logs = new ArrayList<>(ids.size());
         ids.forEach(id->{
@@ -58,8 +58,8 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateStatus(Student student, String courseId) {
-        String id = studentCourseMapper.findIdByStudentIdAndCourseId(student.getId(), courseId);
+    public void updateStatus(Student student, String courseId, String code) {
+        String id = studentCourseMapper.findIdByStudentIdAndCourseId(student.getId(), courseId, code);
         attendancelogMapper.updateTypeById(id, AttendanceTypeEnum.ONTIME.name);
     }
 }
