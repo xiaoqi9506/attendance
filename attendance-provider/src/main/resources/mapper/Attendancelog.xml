@@ -12,7 +12,7 @@
     <update id="updateTypeById">
         UPDATE scau_attendance_log log
         SET log.type = #{type}
-        WHERE log.student_course_id = #{id}
+        WHERE log.student_course_id = #{id} AND log.batch_code = #{batchCode}
     </update>
 
     <select id="countByIds" resultType="cn.howtoplay.attendance.domain.vo.CourseScoreVo">
@@ -31,6 +31,6 @@
         SELECT log.id, log.type, log.created_at
         FROM scau_attendance_log log
         WHERE log.student_course_id = #{courseId}
-        ORDER BY log.created_at
+        ORDER BY log.created_at DESC
     </select>
 </mapper>

@@ -17,5 +17,5 @@ public interface StudentCourseMapper {
 
     List<String> findIdByCourseId(String courseId);
 
-    String findIdByStudentIdAndCourseId(@Param("studentId") String studentId, @Param("courseId") String courseId, @Param("code") String code);
+    String findIdByStudentIdAndCourseId(@Param("studentId") String studentId, @Param("courseId") String courseId);
 }

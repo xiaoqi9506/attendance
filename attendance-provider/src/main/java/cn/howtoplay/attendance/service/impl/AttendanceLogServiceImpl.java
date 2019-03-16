@@ -64,7 +64,7 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Student student, String courseId, String batchCode) {
-        String id = studentCourseMapper.findIdByStudentIdAndCourseId(student.getId(), courseId, batchCode);
-        attendancelogMapper.updateTypeById(id, AttendanceTypeEnum.ONTIME.name);
+        String id = studentCourseMapper.findIdByStudentIdAndCourseId(student.getId(), courseId);
+        attendancelogMapper.updateTypeById(id, AttendanceTypeEnum.ONTIME.name, batchCode);
     }
 }

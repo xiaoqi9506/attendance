@@ -19,5 +19,5 @@ public interface AttendancelogMapper extends BaseMapper<AttendanceLog> {
 
     void bulkInsert(@Param("logs") List<AttendanceLog> logs);
 
-    void updateTypeById(@Param("id") String id, @Param("type") String type);
+    void updateTypeById(@Param("id") String id, @Param("type") String type, @Param("batchCode") String batchCode);
 }
