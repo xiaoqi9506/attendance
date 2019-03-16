@@ -9,6 +9,11 @@
             (#{log.id}, #{log.studentCourseId}, #{log.type}, #{log.createdAt}, #{log.dr}, #{log.batchCode})
         </foreach>
     </insert>
+    <update id="updateTypeById">
+        UPDATE scau_attendance_log log
+        SET log.type = #{type}
+        WHERE log.student_course_id = #{id}
+    </update>
 
     <select id="countByIds" resultType="cn.howtoplay.attendance.domain.vo.CourseScoreVo">
         SELECT

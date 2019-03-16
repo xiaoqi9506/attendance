@@ -18,4 +18,6 @@ public interface AttendancelogMapper extends BaseMapper<AttendanceLog> {
     List<AttendanceLogsVo> findByStudentIdAndCourseId(@Param("courseId") String courseId);
 
     void bulkInsert(@Param("logs") List<AttendanceLog> logs);
+
+    void updateTypeById(@Param("id") String id, @Param("type") String type);
 }
