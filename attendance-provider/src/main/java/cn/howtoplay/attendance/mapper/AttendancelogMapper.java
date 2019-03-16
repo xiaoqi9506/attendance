@@ -1,5 +1,6 @@
 package cn.howtoplay.attendance.mapper;
 
+import cn.howtoplay.attendance.domain.enums.AttendanceTypeEnum;
 import cn.howtoplay.attendance.domain.eo.AttendanceLog;
 import cn.howtoplay.attendance.domain.vo.AttendanceLogsVo;
 import cn.howtoplay.attendance.domain.vo.CourseScoreVo;
@@ -20,4 +21,6 @@ public interface AttendancelogMapper extends BaseMapper<AttendanceLog> {
     void bulkInsert(@Param("logs") List<AttendanceLog> logs);
 
     void updateTypeById(@Param("id") String id, @Param("type") String type, @Param("batchCode") String batchCode);
+
+    String findByIdAndTypeAndBatchCode(@Param("id") String id, @Param("type") AttendanceTypeEnum absence, @Param("batchCode") String batchCode);
 }

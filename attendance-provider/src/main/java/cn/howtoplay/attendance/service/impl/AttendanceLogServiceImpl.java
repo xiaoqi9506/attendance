@@ -3,12 +3,14 @@ package cn.howtoplay.attendance.service.impl;
 import cn.howtoplay.attendance.domain.enums.AttendanceTypeEnum;
 import cn.howtoplay.attendance.domain.eo.AttendanceLog;
 import cn.howtoplay.attendance.domain.eo.Student;
+import cn.howtoplay.attendance.extension.ApplicationException;
 import cn.howtoplay.attendance.mapper.AttendancelogMapper;
 import cn.howtoplay.attendance.mapper.StudentCourseMapper;
 import cn.howtoplay.attendance.service.AttendanceLogService;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RList;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -65,6 +68,10 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Student student, String courseId, String batchCode) {
         String id = studentCourseMapper.findIdByStudentIdAndCourseId(student.getId(), courseId);
+        String id1 = attendancelogMapper.findByIdAndTypeAndBatchCode(id, AttendanceTypeEnum.ABSENCE, batchCode);
+        if (StringUtils.isEmpty(id1)) {
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "你已成功签到");
+        }
         attendancelogMapper.updateTypeById(id, AttendanceTypeEnum.ONTIME.name, batchCode);
     }
 }

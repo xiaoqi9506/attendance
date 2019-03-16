@@ -67,12 +67,12 @@ public class AttendanceLogController {
         }
         RList<String> list = redissonClient.getList("start:code:" + code);
         if (CollectionUtil.isEmpty(list) || list.size() < 2) {
-            throw new ApplicationException(Response.Status.BAD_REQUEST, "code无效");
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "code无效，签到失败");
         }
         String courseId = list.get(0);
         String batchCode = list.get(1);
         if (StringUtils.isEmpty(courseId) || StringUtils.isEmpty(batchCode)) {
-            throw new ApplicationException(Response.Status.BAD_REQUEST, "code无效");
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "code无效，签到失败");
         }
         attendanceLogService.updateStatus(student, courseId, batchCode);
         return new Payload(null);
