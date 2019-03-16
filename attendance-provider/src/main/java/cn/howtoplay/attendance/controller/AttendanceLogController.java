@@ -8,6 +8,7 @@ import cn.howtoplay.attendance.service.AttendanceLogService;
 import cn.howtoplay.attendance.service.StudentService;
 import cn.hutool.core.collection.CollectionUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RList;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,15 +65,16 @@ public class AttendanceLogController {
         if (null == student) {
             throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
         }
-        RMap<String, String> map = redissonClient.getMap("start:code:");
-        if (CollectionUtil.isEmpty(map)) {
+        RList<String> list = redissonClient.getList("start:code:" + code);
+        if (CollectionUtil.isEmpty(list) || list.size() < 2) {
             throw new ApplicationException(Response.Status.BAD_REQUEST, "code无效");
         }
-        String courseId = map.get(code);
-        if (StringUtils.isEmpty(courseId)) {
+        String courseId = list.get(0);
+        String batchCode = list.get(1);
+        if (StringUtils.isEmpty(courseId) || StringUtils.isEmpty(batchCode)) {
             throw new ApplicationException(Response.Status.BAD_REQUEST, "code无效");
         }
-        attendanceLogService.updateStatus(student, courseId, code);
+        attendanceLogService.updateStatus(student, courseId, batchCode);
         return new Payload(null);
     }
 }

@@ -6,8 +6,10 @@ import cn.howtoplay.attendance.domain.eo.Student;
 import cn.howtoplay.attendance.mapper.AttendancelogMapper;
 import cn.howtoplay.attendance.mapper.StudentCourseMapper;
 import cn.howtoplay.attendance.service.AttendanceLogService;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import org.redisson.api.RList;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,8 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
     public String start(String courseId) {
         List<String> ids = studentCourseMapper.findIdByCourseId(courseId);
         String code = RandomUtil.randomNumbers(4);
+        String pre = DateUtil.format(new Date(), "yyyyMMddhhmmss");
+        String batchCode = pre + RandomUtil.randomNumbers(6);
         List<AttendanceLog> logs = new ArrayList<>(ids.size());
         ids.forEach(id->{
             AttendanceLog log = new AttendanceLog();
@@ -47,19 +51,20 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
             log.setType(AttendanceTypeEnum.ABSENCE.name);
             log.setCreatedAt(new Date());
             log.setDr(0);
-            log.setBatchCode(code);
+            log.setBatchCode(batchCode);
             logs.add(log);
         });
-        RMap<String, String> map = redissonClient.getMap("start:code:");
-        map.put(code, courseId);
+        RList<String> list = redissonClient.getList("start:code:" + code);
+        list.add(courseId);
+        list.add(batchCode);
         attendancelogMapper.bulkInsert(logs);
         return code;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateStatus(Student student, String courseId, String code) {
-        String id = studentCourseMapper.findIdByStudentIdAndCourseId(student.getId(), courseId, code);
+    public void updateStatus(Student student, String courseId, String batchCode) {
+        String id = studentCourseMapper.findIdByStudentIdAndCourseId(student.getId(), courseId, batchCode);
         attendancelogMapper.updateTypeById(id, AttendanceTypeEnum.ONTIME.name);
     }
 }

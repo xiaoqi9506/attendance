@@ -9,5 +9,5 @@ public interface AttendanceLogService {
 
     String start(String courseId);
 
-    void updateStatus(Student student, String courseId, String code);
+    void updateStatus(Student student, String courseId, String batchCode);
 }
