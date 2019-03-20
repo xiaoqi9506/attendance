@@ -6,14 +6,24 @@ import cn.howtoplay.attendance.domain.eo.Student;
 import cn.howtoplay.attendance.domain.vo.StudentAttendancelogsVo;
 import cn.howtoplay.attendance.domain.vo.StudentVo;
 import cn.howtoplay.attendance.extension.ApplicationException;
+import cn.howtoplay.attendance.service.AttendanceLogService;
 import cn.howtoplay.attendance.service.StudentService;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.extra.servlet.multipart.MultipartFormData;
+import cn.hutool.extra.servlet.multipart.UploadFile;
 import com.github.pagehelper.PageInfo;
+import com.qcloud.cos.transfer.TransferManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
@@ -27,8 +37,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +58,8 @@ import java.util.Map;
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class StudentController {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     private StudentService studentService;
 
@@ -50,6 +68,9 @@ public class StudentController {
 
     @Autowired
     private HttpServletResponse response;
+
+    @Autowired
+    private AttendanceLogService attendanceLogService;
 
     @Path("/")
     @POST
@@ -216,5 +237,69 @@ public class StudentController {
         }
         List<StudentAttendancelogsVo> list = studentService.listAttendancelogs(student);
         return new Payload(list);
+    }
+
+    @Autowired
+    private TransferManager transferManager;
+
+    @Value("${cos.bucketname}")
+    private String bucketName;
+
+    @Value("${cos.fileurl}")
+    private String fileUrl;
+
+    @POST
+    @Path("/logs/qingjia")
+    @NeedToken
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Payload qingJia(@CookieParam("token") String token, @Context HttpServletRequest request) {
+        Student student = studentService.findByToken(token);
+        if (null == student) {
+            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
+        }
+        MultipartFormData formData = new MultipartFormData();
+        FileOutputStream outputStream = null;
+        try {
+            formData.parseRequest(request);
+            if (formData.isLoaded()) {
+                //获取上传的图片
+                UploadFile img = formData.getFile("img");
+                File tempFile = File.createTempFile(img.getFileName(), "");
+                outputStream = new FileOutputStream(tempFile);
+                outputStream.write(img.getFileContent());
+                //保存到cos的图片的文件名，根据这个文件名可以找回图片
+                String cosFileName = "img" + IdUtil.fastSimpleUUID();
+                //上传图片到cos，多线程异步上传
+                transferManager.upload(bucketName, cosFileName, tempFile);
+                //获取其他请假信息
+                String startTimeStr = formData.getParam("startTime");
+                String endTimeStr = formData.getParam("endTime");
+                String reason = formData.getParam("reason");
+                String guardian = formData.getParam("guardian");
+                String guardianMobile = formData.getParam("guardianMobile");
+                //数据校验
+                Date startTime = DateUtils.parseDate(startTimeStr, "yyyy-MM-dd");
+                Date endTime = DateUtils.parseDate(endTimeStr, "yyyy-MM-dd");
+                if (StringUtils.isEmpty(reason) || StringUtils.isEmpty(guardian) || StringUtils.isEmpty(guardianMobile)) {
+                    throw new ApplicationException(Response.Status.BAD_REQUEST, "参数有误");
+                }
+                //TODO 手机号校验
+                attendanceLogService.qingjia(student, startTime, endTime, reason, guardian, guardianMobile, fileUrl + "/" + cosFileName);
+            }
+        } catch (IOException e) {
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "请求解析失败！！！");
+        } catch (ParseException e) {
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "参数有误");
+        } finally {
+            if (null != outputStream) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    logger.info("输出流关闭失败！！！！！");
+                    e.printStackTrace();
+                }
+            }
+        }
+        return new Payload("success");
     }
 }

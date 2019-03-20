@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.qcloud.cos.transfer.TransferManager;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
@@ -55,6 +56,9 @@ public class StudentServiceImpl implements StudentService {
 
     @Autowired
     private TeacherMapper teacherMapper;
+
+    @Autowired
+    private TransferManager transferManager;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

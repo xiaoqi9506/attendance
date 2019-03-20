@@ -1,10 +1,13 @@
 package cn.howtoplay.attendance.service.impl;
 
 import cn.howtoplay.attendance.domain.enums.AttendanceTypeEnum;
+import cn.howtoplay.attendance.domain.enums.LeaveStatusType;
 import cn.howtoplay.attendance.domain.eo.AttendanceLog;
+import cn.howtoplay.attendance.domain.eo.LeaveInfo;
 import cn.howtoplay.attendance.domain.eo.Student;
 import cn.howtoplay.attendance.extension.ApplicationException;
 import cn.howtoplay.attendance.mapper.AttendancelogMapper;
+import cn.howtoplay.attendance.mapper.LeaveInfoMapper;
 import cn.howtoplay.attendance.mapper.StudentCourseMapper;
 import cn.howtoplay.attendance.service.AttendanceLogService;
 import cn.hutool.core.date.DateUtil;
@@ -12,7 +15,6 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RList;
-import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,9 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
 
     @Autowired
     private RedissonClient redissonClient;
+
+    @Autowired
+    private LeaveInfoMapper leaveInfoMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -73,5 +78,23 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
             throw new ApplicationException(Response.Status.BAD_REQUEST, "你已成功签到");
         }
         attendancelogMapper.updateTypeById(id, AttendanceTypeEnum.ONTIME.name, batchCode);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void qingjia(Student student, Date startTime, Date endTime, String reason, String guardian, String guardianMobile, String url) {
+        LeaveInfo leaveInfo = new LeaveInfo();
+        leaveInfo.setEndTime(endTime);
+        leaveInfo.setGuardian(guardian);
+        leaveInfo.setGuardianMobile(guardianMobile);
+        leaveInfo.setImgUrl(url);
+        leaveInfo.setStartTime(startTime);
+        leaveInfo.setStudentId(student.getId());
+        leaveInfo.setLeaveReason(reason);
+        leaveInfo.setId(IdUtil.fastSimpleUUID());
+        leaveInfo.setStatus(LeaveStatusType.WAIT.name());
+        //TODO 审批人
+        leaveInfoMapper.insert(leaveInfo);
+        //TODO 发短信
     }
 }
