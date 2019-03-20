@@ -265,6 +265,18 @@ public class StudentController {
         return new Payload("success");
     }
 
+    @GET
+    @Path("/logs/qingjia")
+    @NeedToken
+    public Payload getLogsQingjia(@CookieParam("token") String token) {
+        Student student = studentService.findByToken(token);
+        if (null == student) {
+            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
+        }
+        List<LeaveInfoVo> list = attendanceLogService.getLogs(student);
+        return new Payload(list);
+    }
+
     @POST
     @Path("/images")
     @Consumes(MediaType.MULTIPART_FORM_DATA)

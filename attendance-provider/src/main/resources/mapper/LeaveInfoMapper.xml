@@ -3,4 +3,18 @@
 
 <mapper namespace="cn.howtoplay.attendance.mapper.LeaveInfoMapper">
 
+    <select id="listByStudentId" resultType="cn.howtoplay.attendance.domain.vo.LeaveInfoVo">
+        SELECT
+        id,
+        start_time,
+        end_time,
+        reason,
+        created_at,
+        status,
+        guardian,
+        guardianMobile,
+        img_url
+        FROM scau_leave_info info
+        WHERE student_id = #{studentId}
+    </select>
 </mapper>

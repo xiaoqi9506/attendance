@@ -101,4 +101,10 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
         leaveInfoMapper.insert(leaveInfo);
         //TODO 发短信
     }
+
+    @Override
+    public List<LeaveInfoVo> getLogs(Student student) {
+        List<LeaveInfoVo> infoVos = leaveInfoMapper.listByStudentId(student.getId());
+        return infoVos;
+    }
 }
