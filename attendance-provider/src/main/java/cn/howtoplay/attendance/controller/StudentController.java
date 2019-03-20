@@ -3,6 +3,7 @@ package cn.howtoplay.attendance.controller;
 import cn.howtoplay.attendance.annotation.NeedToken;
 import cn.howtoplay.attendance.common.Payload;
 import cn.howtoplay.attendance.domain.eo.Student;
+import cn.howtoplay.attendance.domain.vo.LeaveInfoVo;
 import cn.howtoplay.attendance.domain.vo.StudentAttendancelogsVo;
 import cn.howtoplay.attendance.domain.vo.StudentVo;
 import cn.howtoplay.attendance.extension.ApplicationException;
@@ -86,8 +87,7 @@ public class StudentController {
             @QueryParam("name") String name,
             @QueryParam("studentCode") String studentCode,
             @QueryParam("page") @DefaultValue("1") Integer page,
-            @QueryParam("size") @DefaultValue("10") Integer size)
-    {
+            @QueryParam("size") @DefaultValue("10") Integer size) {
         //TODO 鉴权
         PageInfo<StudentVo> list = studentService.getStudentList(name, studentCode, page, size);
         return list;
@@ -117,11 +117,10 @@ public class StudentController {
     @Path("/login")
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Payload login(@FormParam("studentCode")  String studentCode,
-                         @FormParam("password")  String password,
+    public Payload login(@FormParam("studentCode") String studentCode,
+                         @FormParam("password") String password,
                          @FormParam("verificationId") String verificationId,
-                         @FormParam("code") String code)
-    {
+                         @FormParam("code") String code) {
 //        //校验验证码
 //        RMap<String, String> map = redissonClient.getMap("verifications");
 //        if (CollectionUtil.isEmpty(map)) {
@@ -206,14 +205,13 @@ public class StudentController {
     @PUT
     @NeedToken
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Payload bindOpenId(@FormParam("studentCode")  String studentCode,
-                              @FormParam("password")  String password,
-                              @CookieParam("token") String token)
-    {
+    public Payload bindOpenId(@FormParam("studentCode") String studentCode,
+                              @FormParam("password") String password,
+                              @CookieParam("token") String token) {
         if (StringUtils.isEmpty(studentCode) || StringUtils.isEmpty(password)) {
             throw new ApplicationException(Response.Status.BAD_REQUEST, "参数有误");
         }
-       return new Payload(studentService.bindOpenid(studentCode, password, token));
+        return new Payload(studentService.bindOpenid(studentCode, password, token));
     }
 
     @GET
@@ -251,45 +249,42 @@ public class StudentController {
     @POST
     @Path("/logs/qingjia")
     @NeedToken
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Payload qingJia(@CookieParam("token") String token, @Context HttpServletRequest request) {
+    public Payload qingJia(@CookieParam("token") String token, LeaveInfoVo info) {
         Student student = studentService.findByToken(token);
         if (null == student) {
             throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
         }
+        //数据校验
+        if (StringUtils.isEmpty(info.getReason())
+                || StringUtils.isEmpty(info.getGuardian())
+                || StringUtils.isEmpty(info.getGuardianMobile())) {
+            throw new ApplicationException(Response.Status.BAD_REQUEST, "参数有误");
+        }
+        //TODO 手机号校验
+        attendanceLogService.qingjia(student, info);
+        return new Payload("success");
+    }
+
+    @POST
+    @Path("/images")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Payload uploadImage(@Context HttpServletRequest request) {
         MultipartFormData formData = new MultipartFormData();
         FileOutputStream outputStream = null;
+        String imageUrl;
         try {
             formData.parseRequest(request);
-            if (formData.isLoaded()) {
-                //获取上传的图片
-                UploadFile img = formData.getFile("img");
-                File tempFile = File.createTempFile(img.getFileName(), "");
-                outputStream = new FileOutputStream(tempFile);
-                outputStream.write(img.getFileContent());
-                //保存到cos的图片的文件名，根据这个文件名可以找回图片
-                String cosFileName = "img" + IdUtil.fastSimpleUUID();
-                //上传图片到cos，多线程异步上传
-                transferManager.upload(bucketName, cosFileName, tempFile);
-                //获取其他请假信息
-                String startTimeStr = formData.getParam("startTime");
-                String endTimeStr = formData.getParam("endTime");
-                String reason = formData.getParam("reason");
-                String guardian = formData.getParam("guardian");
-                String guardianMobile = formData.getParam("guardianMobile");
-                //数据校验
-                Date startTime = DateUtils.parseDate(startTimeStr, "yyyy-MM-dd");
-                Date endTime = DateUtils.parseDate(endTimeStr, "yyyy-MM-dd");
-                if (StringUtils.isEmpty(reason) || StringUtils.isEmpty(guardian) || StringUtils.isEmpty(guardianMobile)) {
-                    throw new ApplicationException(Response.Status.BAD_REQUEST, "参数有误");
-                }
-                //TODO 手机号校验
-                attendanceLogService.qingjia(student, startTime, endTime, reason, guardian, guardianMobile, fileUrl + "/" + cosFileName);
-            }
+            UploadFile img = formData.getFile("img");
+            File tempFile = File.createTempFile(img.getFileName(), "");
+            outputStream = new FileOutputStream(tempFile);
+            outputStream.write(img.getFileContent());
+            //保存到cos的图片的文件名，根据这个文件名可以找回图片
+            String cosFileName = "img" + IdUtil.fastSimpleUUID();
+            //上传图片到cos，多线程异步上传
+            transferManager.upload(bucketName, cosFileName, tempFile);
+            imageUrl = fileUrl + "/" + cosFileName;
         } catch (IOException e) {
             throw new ApplicationException(Response.Status.BAD_REQUEST, "请求解析失败！！！");
-        } catch (ParseException e) {
-            throw new ApplicationException(Response.Status.BAD_REQUEST, "参数有误");
         } finally {
             if (null != outputStream) {
                 try {
@@ -300,6 +295,6 @@ public class StudentController {
                 }
             }
         }
-        return new Payload("success");
+        return new Payload(imageUrl);
     }
 }

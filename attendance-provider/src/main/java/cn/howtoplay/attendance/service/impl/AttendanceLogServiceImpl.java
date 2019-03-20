@@ -5,12 +5,14 @@ import cn.howtoplay.attendance.domain.enums.LeaveStatusType;
 import cn.howtoplay.attendance.domain.eo.AttendanceLog;
 import cn.howtoplay.attendance.domain.eo.LeaveInfo;
 import cn.howtoplay.attendance.domain.eo.Student;
+import cn.howtoplay.attendance.domain.vo.LeaveInfoVo;
 import cn.howtoplay.attendance.extension.ApplicationException;
 import cn.howtoplay.attendance.mapper.AttendancelogMapper;
 import cn.howtoplay.attendance.mapper.LeaveInfoMapper;
 import cn.howtoplay.attendance.mapper.StudentCourseMapper;
 import cn.howtoplay.attendance.service.AttendanceLogService;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -82,15 +84,15 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void qingjia(Student student, Date startTime, Date endTime, String reason, String guardian, String guardianMobile, String url) {
+    public void qingjia(Student student, LeaveInfoVo info) {
         LeaveInfo leaveInfo = new LeaveInfo();
-        leaveInfo.setEndTime(endTime);
-        leaveInfo.setGuardian(guardian);
-        leaveInfo.setGuardianMobile(guardianMobile);
-        leaveInfo.setImgUrl(url);
-        leaveInfo.setStartTime(startTime);
+        leaveInfo.setEndTime(info.getEndTime());
+        leaveInfo.setGuardian(info.getGuardian());
+        leaveInfo.setGuardianMobile(info.getGuardianMobile());
+        leaveInfo.setImgUrl(ArrayUtil.join(info.getImgUrls(), ","));
+        leaveInfo.setStartTime(info.getStartTime());
         leaveInfo.setStudentId(student.getId());
-        leaveInfo.setLeaveReason(reason);
+        leaveInfo.setLeaveReason(info.getReason());
         leaveInfo.setId(IdUtil.fastSimpleUUID());
         leaveInfo.setStatus(LeaveStatusType.WAIT.name());
         //TODO 审批人

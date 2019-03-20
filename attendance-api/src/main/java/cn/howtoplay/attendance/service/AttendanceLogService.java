@@ -1,6 +1,7 @@
 package cn.howtoplay.attendance.service;
 
 import cn.howtoplay.attendance.domain.eo.Student;
+import cn.howtoplay.attendance.domain.vo.LeaveInfoVo;
 
 import java.util.Date;
 
@@ -13,5 +14,5 @@ public interface AttendanceLogService {
 
     void updateStatus(Student student, String courseId, String batchCode);
 
-    void qingjia(Student student, Date startTime, Date endTime, String reason, String guardian, String guardianMobile, String url);
+    void qingjia(Student student, LeaveInfoVo info);
 }
