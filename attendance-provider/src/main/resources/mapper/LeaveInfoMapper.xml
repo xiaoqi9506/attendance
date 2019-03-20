@@ -8,7 +8,7 @@
         id,
         start_time,
         end_time,
-        reason,
+        leave_reason AS reason ,
         created_at,
         status,
         guardian,
