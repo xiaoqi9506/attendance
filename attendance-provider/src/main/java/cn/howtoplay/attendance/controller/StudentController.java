@@ -291,7 +291,7 @@ public class StudentController {
                     outputStream.close();
                 } catch (IOException e) {
                     logger.info("输出流关闭失败！！！！！");
-                    e.printStackTrace();
+                    throw new ApplicationException(Response.Status.INTERNAL_SERVER_ERROR, "输出流关闭失败！！！");
                 }
             }
         }

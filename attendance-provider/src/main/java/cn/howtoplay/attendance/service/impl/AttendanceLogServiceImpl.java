@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -89,7 +91,7 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
         leaveInfo.setEndTime(info.getEndTime());
         leaveInfo.setGuardian(info.getGuardian());
         leaveInfo.setGuardianMobile(info.getGuardianMobile());
-        leaveInfo.setImgUrl(ArrayUtil.join(info.getImgUrls(), ","));
+        leaveInfo.setImgUrl(ArrayUtil.join(ArrayUtil.toArray(info.getImgUrls(), String.class), ","));
         leaveInfo.setStartTime(info.getStartTime());
         leaveInfo.setStudentId(student.getId());
         leaveInfo.setLeaveReason(info.getReason());
