@@ -97,6 +97,7 @@ public class AttendanceLogServiceImpl implements AttendanceLogService {
         leaveInfo.setLeaveReason(info.getReason());
         leaveInfo.setId(IdUtil.fastSimpleUUID());
         leaveInfo.setStatus(LeaveStatusType.WAIT.name());
+        leaveInfo.setCreatedAt(new Date());
         //TODO 审批人
         leaveInfoMapper.insert(leaveInfo);
         //TODO 发短信

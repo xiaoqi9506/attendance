@@ -9,12 +9,14 @@ import java.util.List;
  * @author xiaoqi on 2019/3/20
  */
 
-@JsonFormat(pattern = "yyyy-MM-dd")
 public class LeaveInfoVo {
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endTime;
     private String reason;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createdAt;
     private String status;
     private String guardian;
