@@ -10,6 +10,7 @@ public class AttendancelogsCount {
     private Integer logTimes;
     private Double onTimeRate;
     private Double lateRate;
+    private Double absenceRate;
     private Double onTimeStudents;
 
     public Integer getLogTimes() {
@@ -58,5 +59,13 @@ public class AttendancelogsCount {
 
     public void setOnTimeStudents(Double onTimeStudents) {
         this.onTimeStudents = onTimeStudents;
+    }
+
+    public Double getAbsenceRate() {
+        return absenceRate;
+    }
+
+    public void setAbsenceRate(Double absenceRate) {
+        this.absenceRate = absenceRate;
     }
 }
