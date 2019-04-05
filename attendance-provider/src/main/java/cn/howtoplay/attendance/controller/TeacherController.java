@@ -3,6 +3,7 @@ package cn.howtoplay.attendance.controller;
 import cn.howtoplay.attendance.annotation.NeedToken;
 import cn.howtoplay.attendance.common.Payload;
 import cn.howtoplay.attendance.domain.eo.Teacher;
+import cn.howtoplay.attendance.domain.vo.AttendancelogsCount;
 import cn.howtoplay.attendance.domain.vo.CourseVo;
 import cn.howtoplay.attendance.extension.ApplicationException;
 import cn.howtoplay.attendance.service.TeacherServide;
@@ -51,5 +52,17 @@ public class TeacherController {
         }
         List<CourseVo> list = teacherServide.getCourses(teacher);
         return new Payload(list);
+    }
+
+    @GET
+    @Path("/logs/count")
+    @NeedToken
+    public Payload getLogsCount(@CookieParam("token") String token) {
+        Teacher teacher = teacherServide.findByToken(token);
+        if (null == teacher) {
+            throw new ApplicationException(Response.Status.UNAUTHORIZED, "token失效，请重新登录");
+        }
+        List<AttendancelogsCount> logsCount = teacherServide.getLogsCount(teacher);
+        return new Payload(logsCount);
     }
 }

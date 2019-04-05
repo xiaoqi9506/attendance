@@ -36,4 +36,18 @@
     <select id="findByIdAndTypeAndBatchCode" resultType="java.lang.String">
         SELECT id FROM scau_attendance_log log WHERE log.student_course_id = #{id} AND log.batch_code = #{batchCode} AND log.type = #{type}
     </select>
+    <select id="selectBatchCodeOfCourse" resultType="java.lang.String">
+        SELECT DISTINCT
+        log.batch_code
+        FROM  scau_attendance_log log
+        WHERE log.student_course_id IN
+        <foreach collection="courseIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectByBatchCode" resultType="cn.howtoplay.attendance.domain.eo.AttendanceLog">
+        SELECT *
+        FROM scau_attendance_log log
+        WHERE log.batch_code = #{batchCode}
+    </select>
 </mapper>

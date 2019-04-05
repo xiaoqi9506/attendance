@@ -3,6 +3,7 @@ package cn.howtoplay.attendance.mapper;
 import cn.howtoplay.attendance.domain.enums.AttendanceTypeEnum;
 import cn.howtoplay.attendance.domain.eo.AttendanceLog;
 import cn.howtoplay.attendance.domain.vo.AttendanceLogsVo;
+import cn.howtoplay.attendance.domain.vo.AttendancelogsCount;
 import cn.howtoplay.attendance.domain.vo.CourseScoreVo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -23,4 +24,8 @@ public interface AttendancelogMapper extends BaseMapper<AttendanceLog> {
     void updateTypeById(@Param("id") String id, @Param("type") String type, @Param("batchCode") String batchCode);
 
     String findByIdAndTypeAndBatchCode(@Param("id") String id, @Param("type") AttendanceTypeEnum absence, @Param("batchCode") String batchCode);
+
+    List<String> selectBatchCodeOfCourse(@Param("courseIds") List<String> studentList);
+
+    List<AttendanceLog> selectByBatchCode(@Param("batchCode") String batchCode);
 }
