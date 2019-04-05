@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -85,9 +86,10 @@ public class TeacherServiceImpl implements TeacherServide {
             double onTimeStudents = countList1.stream().mapToDouble(AttendancelogsCount::getOnTimeStudents).sum();
             AttendancelogsCount count = new AttendancelogsCount();
             count.setLogTimes(batchCodes.size());
-            count.setOnTimeRate(onTimeRate/countList1.size());
-            count.setLateRate(lateRate/countList1.size());
-            count.setOnTimeStudents(onTimeStudents/countList1.size());
+            DecimalFormat df = new DecimalFormat("0.0000");
+            count.setOnTimeRate(Double.valueOf(df.format(onTimeRate/countList1.size())));
+            count.setLateRate(Double.valueOf(df.format(lateRate/countList1.size())));
+            count.setOnTimeStudents(Double.valueOf(df.format(onTimeStudents/countList1.size())));
             count.setCourseId(courseVo.getCourseId());
             count.setCourseName(courseVo.getName());
             countList.add(count);
